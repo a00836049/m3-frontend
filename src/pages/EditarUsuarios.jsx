@@ -15,16 +15,17 @@ function EditarUsuarios({ usuario, onVolver }) {
     e.preventDefault();
     setMessage('');
     try {
+      const { password, ...formSinPassword } = form; // Excluye password del body
       const res = await fetch(`http://localhost:3000/updateuser/${form.id_usuario}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(formSinPassword)
       });
       if (res.ok) {
         setMessage('¡Usuario actualizado correctamente!');
         setTimeout(() => {
           onVolver();
-        }, 1000); // Espera breve para mostrar el mensaje antes de volver
+        }, 1000);
       } else {
         const errorText = await res.text();
         setMessage('Error al actualizar: ' + errorText);
@@ -49,14 +50,6 @@ function EditarUsuarios({ usuario, onVolver }) {
           label="Apellido"
           name="apellido"
           value={form.apellido || ''}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          label="Contraseña"
-          name="password"
-          type="password"
-          value={form.password || ''}
           onChange={handleChange}
           required
         />
