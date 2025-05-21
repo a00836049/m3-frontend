@@ -3,6 +3,7 @@ import './App.css'
 import RegistrarUsuario from './pages/RegistrarUsuario'
 import ListaUsuarios from './pages/ListaUsuarios'
 import EditarUsuarios from './pages/EditarUsuarios'
+import Login from './pages/Login'
 import { AppBar, Toolbar, Button, Typography, Box } from '@mui/material'
 
 function App() {
@@ -30,12 +31,16 @@ function App() {
             <Button color="inherit" onClick={() => { setView('lista'); setUsuarioEditar(null); }}>
               Lista de Usuarios
             </Button>
+            <Button color="inherit" onClick={() => { setView('login'); setUsuarioEditar(null); }}>
+              Login
+            </Button>
           </Box>
         </Toolbar>
       </AppBar>
       {view === 'registrar' && <RegistrarUsuario />}
       {view === 'lista' && <ListaUsuarios onEditar={handleEditar} />}
       {view === 'editar' && <EditarUsuarios usuario={usuarioEditar} onVolver={handleVolver} />}
+      {view === 'login' && <Login />}
     </>
   )
 }
