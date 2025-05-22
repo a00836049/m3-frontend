@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { userAPI } from '../services/api';
 
 function BorrarUsuario({ usuario, onBorrado }) {
   const [open, setOpen] = useState(false);
@@ -17,12 +18,10 @@ function BorrarUsuario({ usuario, onBorrado }) {
   const handleDelete = async (e) => {
     e.stopPropagation();
     try {
-      await fetch(`http://localhost:3000/deleteuser/${usuario.id_usuario}`, {
-        method: 'DELETE'
-      });
+      await userAPI.delete(usuario.id_usuario);
       if (onBorrado) onBorrado(usuario.id_usuario);
-    } catch {
-      alert('Error al borrar usuario');
+    } catch (err) {
+      alert('Error al borrar usuario: ' + (err.response?.data?.message || err.message));
     } finally {
       setOpen(false);
     }

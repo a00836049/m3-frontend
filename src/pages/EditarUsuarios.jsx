@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, TextField, Paper, Typography, CircularProgress, Alert } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
+import { userAPI } from '../services/api';
 
 function EditarUsuarios({ usuario }) {
   const navigate = useNavigate();
@@ -30,33 +31,20 @@ function EditarUsuarios({ usuario }) {
         pelicula_favorita: form.pelicula_favorita
       };
       
-      // Obtener el token JWT del localStorage
+      // Verificar que hay un token
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No hay sesión activa');
       }
       
-      const res = await fetch(`http://localhost:3000/updateuser/${form.id_usuario}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(datosActualizar)
-      });
-      
-      if (res.ok) {
-        setMessage('¡Usuario actualizado correctamente!');
-        setSuccess(true);
-        setTimeout(() => {
-          navigate('/lista');
-        }, 1500);
-      } else {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Error al actualizar usuario');
-      }
+      await userAPI.update(form.id_usuario, datosActualizar);
+      setMessage('¡Usuario actualizado correctamente!');
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/lista');
+      }, 1500);
     } catch (err) {
-      setMessage('Error al actualizar: ' + err.message);
+      setMessage('Error al actualizar: ' + (err.response?.data?.message || err.message));
       console.error('Error completo:', err);
     } finally {
       setLoading(false);

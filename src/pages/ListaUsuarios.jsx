@@ -4,7 +4,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Paper, Button, Typography, CircularProgress, Alert
 } from '@mui/material';
-import { fetchWithAuth } from '../util/auth';
+import { userAPI } from '../services/api';
 
 function ListaUsuarios({ onEditar }) {
   const [usuarios, setUsuarios] = useState([]);
@@ -15,13 +15,12 @@ function ListaUsuarios({ onEditar }) {
   const fetchUsuarios = async () => {
     try {
       setLoading(true);
-      const response = await fetchWithAuth('http://localhost:3000/users');
-      const data = await response.json();
-      setUsuarios(data);
+      const response = await userAPI.getAll();
+      setUsuarios(response.data);
       setError(null);
     } catch (err) {
       console.error('Error al obtener usuarios:', err);
-      setError('Error al cargar los usuarios: ' + err.message);
+      setError('Error al cargar los usuarios: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
@@ -34,17 +33,12 @@ function ListaUsuarios({ onEditar }) {
   const handleEliminar = async (id) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
       try {
-        const response = await fetchWithAuth(`http://localhost:3000/deleteuser/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (response.ok) {
-          // Actualizar la lista después de eliminar
-          fetchUsuarios();
-        }
+        await userAPI.delete(id);
+        // Actualizar la lista después de eliminar
+        fetchUsuarios();
       } catch (err) {
         console.error('Error al eliminar usuario:', err);
-        setError('Error al eliminar usuario: ' + err.message);
+        setError('Error al eliminar usuario: ' + (err.response?.data?.message || err.message));
       }
     }
   };

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TextField, Button, Paper, Typography, Alert } from '@mui/material';
+import { userAPI } from '../services/api';
 
 function RegistrarUsuario() {
   const [form, setForm] = useState({
@@ -21,30 +22,17 @@ function RegistrarUsuario() {
     setLoading(true);
     
     try {
-      // Obtener el token JWT del localStorage
+      // Verificar que hay un token
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No hay sesión activa');
       }
       
-      const res = await fetch('http://localhost:3000/postusers', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(form)
-      });
-      
-      if (res.ok) {
-        setMessage('¡Usuario registrado correctamente!');
-        setForm({ nombre: '', apellido: '', password: '', pelicula_favorita: '' });
-      } else {
-        const data = await res.json();
-        setMessage(data.message || 'Error al registrar usuario');
-      }
+      await userAPI.create(form);
+      setMessage('¡Usuario registrado correctamente!');
+      setForm({ nombre: '', apellido: '', password: '', pelicula_favorita: '' });
     } catch (err) {
-      setMessage('Error: ' + err.message);
+      setMessage('Error: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
