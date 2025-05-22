@@ -9,6 +9,7 @@ function RegistrarUsuario() {
     pelicula_favorita: ''
   });
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,21 +18,35 @@ function RegistrarUsuario() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    setLoading(true);
+    
     try {
+      // Obtener el token JWT del localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No hay sesión activa');
+      }
+      
       const res = await fetch('http://localhost:3000/postusers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(form)
       });
+      
       if (res.ok) {
-        setMessage('¡Registro enviado correctamente!');
+        setMessage('¡Usuario registrado correctamente!');
         setForm({ nombre: '', apellido: '', password: '', pelicula_favorita: '' });
       } else {
-        const errorText = await res.text();
-        setMessage('Error al enviar el registro: ' + errorText);
+        const data = await res.json();
+        setMessage(data.message || 'Error al registrar usuario');
       }
     } catch (err) {
-      setMessage('Error de conexión: ' + err.message);
+      setMessage('Error: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,12 +83,12 @@ function RegistrarUsuario() {
           onChange={handleChange}
           required
         />
-        <Button type="submit" variant="contained" color="primary">
-          Enviar
+        <Button type="submit" variant="contained" color="primary" disabled={loading}>
+          {loading ? 'Enviando...' : 'Enviar'}
         </Button>
       </form>
       {message && (
-        <Alert severity={message.startsWith('¡Registro') ? 'success' : 'error'} sx={{ mt: 2 }}>
+        <Alert severity={message.startsWith('¡Usuario registrado') ? 'success' : 'error'} sx={{ mt: 2 }}>
           {message}
         </Alert>
       )}

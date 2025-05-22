@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { TextField, Button, Paper, Typography, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Paper, Typography, Alert, CircularProgress } from '@mui/material';
 
 function Login({ onLogin }) {
   const [form, setForm] = useState({ nombre: '', password: '' });
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -12,21 +15,31 @@ function Login({ onLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    setLoading(true);
+    
     try {
       const res = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
+      
       const data = await res.json();
+      
       if (res.ok) {
         setMessage('¡Login exitoso!');
-        if (onLogin) onLogin(data.user);
+        // Pequeña pausa para mostrar el mensaje antes de redirigir
+        setTimeout(() => {
+          if (onLogin) onLogin(data.user, data.token); // Pasar también el token
+          navigate('/menu');
+        }, 1000);
       } else {
         setMessage(data.message || 'Error al iniciar sesión');
       }
     } catch (err) {
       setMessage('Error de conexión: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,6 +53,7 @@ function Login({ onLogin }) {
           value={form.nombre}
           onChange={handleChange}
           required
+          disabled={loading}
         />
         <TextField
           label="Contraseña"
@@ -48,9 +62,15 @@ function Login({ onLogin }) {
           value={form.password}
           onChange={handleChange}
           required
+          disabled={loading}
         />
-        <Button type="submit" variant="contained" color="primary">
-          Ingresar
+        <Button 
+          type="submit" 
+          variant="contained" 
+          color="primary"
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} /> : 'Ingresar'}
         </Button>
       </form>
       {message && (

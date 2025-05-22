@@ -1,77 +1,128 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Typography, CircularProgress, Alert, Button
+  Table, TableBody, TableCell, TableContainer, TableHead,
+  TableRow, Paper, Button, Typography, CircularProgress, Alert
 } from '@mui/material';
-import BorrarUsuario from './Borrarusuarios';
+import { fetchWithAuth } from '../util/auth';
 
 function ListaUsuarios({ onEditar }) {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const fetchUsuarios = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchWithAuth('http://localhost:3000/users');
+      const data = await response.json();
+      setUsuarios(data);
+      setError(null);
+    } catch (err) {
+      console.error('Error al obtener usuarios:', err);
+      setError('Error al cargar los usuarios: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchUsuarios() {
-      try {
-        const res = await fetch('http://localhost:3000/users');
-        if (!res.ok) {
-          throw new Error('Error al obtener usuarios');
-        }
-        const data = await res.json();
-        setUsuarios(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchUsuarios();
   }, []);
 
-  const handleBorrado = (id_usuario) => {
-    setUsuarios(usuarios.filter(u => u.id_usuario !== id_usuario));
+  const handleEliminar = async (id) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+      try {
+        const response = await fetchWithAuth(`http://localhost:3000/deleteuser/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          // Actualizar la lista después de eliminar
+          fetchUsuarios();
+        }
+      } catch (err) {
+        console.error('Error al eliminar usuario:', err);
+        setError('Error al eliminar usuario: ' + err.message);
+      }
+    }
   };
 
-  if (loading) return <CircularProgress sx={{ mt: 4 }} />;
-  if (error) return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
+  const handleEditarClick = (usuario) => {
+    onEditar(usuario);
+    navigate(`/editar/${usuario.id_usuario}`);
+  };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ mt: 2, mx: 2 }}>
+        {error}
+      </Alert>
+    );
+  }
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 4, maxWidth: 700, mx: 'auto' }}>
-      <Typography variant="h5" align="center" sx={{ my: 2 }}>
+    <div style={{ padding: 20 }}>
+      <Typography variant="h5" gutterBottom>
         Lista de Usuarios
       </Typography>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell><b>Nombre</b></TableCell>
-            <TableCell><b>Apellido</b></TableCell>
-            <TableCell><b>Película Favorita</b></TableCell>
-            <TableCell><b>Acciones</b></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {usuarios.map((u, idx) => (
-            <TableRow key={idx}>
-              <TableCell>{u.nombre}</TableCell>
-              <TableCell>{u.apellido}</TableCell>
-              <TableCell>{u.pelicula_favorita}</TableCell>
-              <TableCell>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => onEditar && onEditar(u)}
-                  size="small"
-                  sx={{ mr: 1 }}
-                >
-                  Editar
-                </Button>
-                <BorrarUsuario usuario={u} onBorrado={handleBorrado} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+
+      {usuarios.length === 0 ? (
+        <Typography>No hay usuarios registrados</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Apellido</TableCell>
+                <TableCell>Película Favorita</TableCell>
+                <TableCell>Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {usuarios.map((usuario) => (
+                <TableRow key={usuario.id_usuario}>
+                  <TableCell>{usuario.id_usuario}</TableCell>
+                  <TableCell>{usuario.nombre}</TableCell>
+                  <TableCell>{usuario.apellido}</TableCell>
+                  <TableCell>{usuario.pelicula_favorita}</TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={() => handleEditarClick(usuario)}
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      sx={{ mr: 1 }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      onClick={() => handleEliminar(usuario.id_usuario)}
+                      variant="contained"
+                      color="error"
+                      size="small"
+                    >
+                      Eliminar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </div>
   );
 }
 
