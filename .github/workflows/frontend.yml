@@ -33,6 +33,10 @@ jobs:
       - name: Build Vite project
         run: npm run build
 
+      # Clean up node_modules to reduce file count
+      - name: Clean up node_modules
+        run: rm -rf node_modules
+
       - name: Deploy to Azure Static Web Apps
         uses: azure/static-web-apps-deploy@v1
         with:
@@ -40,4 +44,3 @@ jobs:
           app_location: "."
           output_location: "dist"
           skip_app_build: true
-          deployment_action: "upload"
