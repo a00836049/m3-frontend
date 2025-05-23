@@ -1,11 +1,11 @@
+ 
 import { useState } from 'react';
 import { Button, TextField, Paper, Typography, CircularProgress, Alert } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { userAPI } from '../services/api';
 
 function EditarUsuarios({ usuario }) {
   const navigate = useNavigate();
-  const { id } = useParams();
   const [form, setForm] = useState(usuario || {});
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
