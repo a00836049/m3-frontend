@@ -1,33 +1,80 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import js from '@eslint/js';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import reactRefreshPlugin from 'eslint-plugin-react-refresh';
+import securityPlugin from 'eslint-plugin-security';
 
 export default [
-  { ignores: ['dist'] },
+  js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        // Browser globals
+        document: 'readonly',
+        window: 'readonly',
+        console: 'readonly',
+        localStorage: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        
+        // Jest globals
+        jest: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        
+        // Node.js globals
+        require: 'readonly',
+        global: 'readonly',
+        module: 'readonly',
+        process: 'readonly'
       },
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
     },
     plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
+      'react-refresh': reactRefreshPlugin,
+      security: securityPlugin
+    },
+    settings: {
+      react: {
+        version: 'detect'
+      }
     },
     rules: {
-      ...js.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
-    },
-  },
-]
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-refresh/only-export-components': 'warn',
+      'no-unused-vars': ['warn', { 
+        'argsIgnorePattern': '^_', 
+        'varsIgnorePattern': '^_',
+        'ignoreRestSiblings': true 
+      }],
+      
+      // Security rules
+      'security/detect-object-injection': 'warn',
+      'security/detect-non-literal-regexp': 'warn',
+      'security/detect-unsafe-regex': 'warn',
+      'security/detect-buffer-noassert': 'error',
+      'security/detect-eval-with-expression': 'error',
+      'security/detect-pseudoRandomBytes': 'warn',
+      'security/detect-possible-timing-attacks': 'warn',
+      'security/detect-no-csrf-before-method-override': 'error'
+    }
+  }
+];

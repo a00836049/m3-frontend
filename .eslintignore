@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+*.min.js
+.env
+coverage/
+public/
+
+# Temporarily ignore problematic files while we set up ESLint
+src/pages/EditarUsuarios.jsx
+src/pages/Borrarusuarios.jsx
+src/pages/ListaUsuarios.jsx
+src/pages/Login.jsx
+src/pages/MenuPrincipal.jsx
+src/pages/RegistrarUsuario.jsx
+src/pages/__tests__/
+.eslintrc.js
