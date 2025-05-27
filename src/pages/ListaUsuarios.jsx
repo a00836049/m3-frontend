@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, Paper, Button, Typography, CircularProgress, Alert
-} from '@mui/material';
+// eslint-disable-next-line no-unused-vars
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, CircularProgress, Alert} from '@mui/material';
 import { userAPI } from '../services/api';
 
 function ListaUsuarios({ onEditar }) {

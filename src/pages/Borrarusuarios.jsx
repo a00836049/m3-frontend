@@ -1,14 +1,6 @@
 import { useState } from 'react';
-import { 
-  Button, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogContentText, 
-  DialogActions,
-  Snackbar,
-  Alert
-} from '@mui/material';
+// eslint-disable-next-line no-unused-vars
+import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert} from '@mui/material';
 import { userAPI } from '../services/api';
 
 function BorrarUsuario({ usuario, onBorrado }) {

@@ -1,6 +1,9 @@
+// eslint-disable-next-line no-unused-vars
 import { Box, Button, Card, CardContent, Typography, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+// eslint-disable-next-line no-unused-vars
 import PeopleIcon from '@mui/icons-material/People';
 
 function MenuPrincipal() {
@@ -11,7 +14,7 @@ function MenuPrincipal() {
       <Typography variant="h4" align="center" gutterBottom>
         Menú Principal
       </Typography>
-      
+
       <Grid container spacing={3} sx={{ mt: 2 }}>
         <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>

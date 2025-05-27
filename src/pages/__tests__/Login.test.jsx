@@ -1,5 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+// eslint-disable-next-line no-unused-vars
 import { MemoryRouter } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import Login from '../Login';
 
 // Mock completo del API
