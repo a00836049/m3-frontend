@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { TextField, Button, Paper, Typography, Alert, CircularProgress } from '@mui/material';
-import { authAPI } from '../services/api';
+import { userAPI } from '../services/api';
 
 function Login({ onLogin }) {
   const [form, setForm] = useState({ nombre: '', password: '' });
@@ -20,7 +20,8 @@ function Login({ onLogin }) {
     setLoading(true);
     
     try {
-      const data = await authAPI.login(form);
+      const response = await userAPI.login(form);
+      const data = response.data;
       
       setMessage('¡Login exitoso!');
       // Pequeña pausa para mostrar el mensaje antes de redirigir
@@ -29,7 +30,8 @@ function Login({ onLogin }) {
         navigate('/menu');
       }, 1000);
     } catch (err) {
-      setMessage(err.message || 'Error al iniciar sesión');
+      const errorMessage = err.response?.data?.message || err.message || 'Error al iniciar sesión';
+      setMessage('Error de conexión: ' + errorMessage);
     } finally {
       setLoading(false);
     }
