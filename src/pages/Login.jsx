@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { TextField, Button, Paper, Typography, Alert, CircularProgress } from '@mui/material';
+import { authAPI } from '../services/api';
 
 function Login({ onLogin }) {
   const [form, setForm] = useState({ nombre: '', password: '' });
@@ -19,26 +20,16 @@ function Login({ onLogin }) {
     setLoading(true);
     
     try {
-      const res = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
+      const data = await authAPI.login(form);
       
-      const data = await res.json();
-      
-      if (res.ok) {
-        setMessage('¡Login exitoso!');
-        // Pequeña pausa para mostrar el mensaje antes de redirigir
-        setTimeout(() => {
-          if (onLogin) onLogin(data.user, data.token); // Pasar también el token
-          navigate('/menu');
-        }, 1000);
-      } else {
-        setMessage(data.message || 'Error al iniciar sesión');
-      }
+      setMessage('¡Login exitoso!');
+      // Pequeña pausa para mostrar el mensaje antes de redirigir
+      setTimeout(() => {
+        if (onLogin) onLogin(data.user, data.token);
+        navigate('/menu');
+      }, 1000);
     } catch (err) {
-      setMessage('Error de conexión: ' + err.message);
+      setMessage(err.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
